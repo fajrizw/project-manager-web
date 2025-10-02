@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role_id',
     ];
 
     /**
@@ -45,4 +46,24 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-}
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function projectsOwned() {
+        return $this->hasMany(Project::class, 'created_by');
+    }
+
+    public function projectsCollab() {
+        return $this->belongsToMany(Project::class, 'project_user')
+                    ->withPivot('role_in_project') // e.g., 'admin', 'project_manager', 'member'
+                    ->withTimestamps();
+    }
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class, 'assigned_to');
+    }
+ }
